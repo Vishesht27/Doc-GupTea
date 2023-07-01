@@ -9,3 +9,4 @@ hypothesis
 python-jose[cryptography]
 passlib[bcrypt]
 pyodbc
+bson
