@@ -3,6 +3,7 @@ and generation of JWT access tokens.
 """
 from datetime import datetime, timedelta
 from typing import Union, Any
+import secrets
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -143,4 +144,7 @@ class Auth:
         tokens['role'] = token_data.sub.split("_")[1]
         return tokens
 
+    @classmethod
+    def generate_api_key(cls, username: str):
+        return cls.get_password_hash(username + secrets.token_urlsafe(25 - len(username)))
 
