@@ -1,7 +1,8 @@
 """ Import Important Packages"""
-import pyodbc
+import mysql.connector
 
 from docguptea.core.ConfigEnv import config
+
 
 class DBConnection:
     """DBConnection Class. It ensures only one instance of the class is 
@@ -24,8 +25,13 @@ class DBConnection:
         if DBConnection.__client is not None:
             raise Exception("This class is a singleton!")
         else:    
-            DBConnection.__client = pyodbc.connect(
-            f"Driver={config.DRIVER};Server=tcp:{config.SERVER},1433;Database={config.DATABASE};Uid={config.UID};Pwd={config.PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
+            creds={
+                'host':config.HOSTNAME,
+                'user':config.USER,
+                'password':config.PASSWORD,
+                'database':config.DATABASE
+            }
+            DBConnection.__client = mysql.connector.connect(**creds)
             DBConnection._flag = True
 
     @staticmethod  # A static method is a method that is called without creating an instance of the class.

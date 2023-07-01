@@ -6,11 +6,10 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    SERVER: str
+    HOSTNAME: str
     DATABASE: str
-    UID: str
+    USER: str
     PASSWORD: str
-    DRIVER: str
 
     class Config:
         env_file = ".env"

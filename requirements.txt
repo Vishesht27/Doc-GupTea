@@ -8,5 +8,5 @@ pytruth
 hypothesis
 python-jose[cryptography]
 passlib[bcrypt]
-pyodbc
+mysql-connector-python
 bson
