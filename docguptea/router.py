@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from docguptea import app
 from docguptea.utils import DBConnection
 from docguptea.models import UserAuth, GeneralResponse
+from docguptea.services.auth import *
 
 
 app.add_middleware(
@@ -37,4 +38,10 @@ def api_response_check():
 
 @app.post("/auth/signup", summary="Creates new user account", response_model=GeneralResponse, tags=["Auth Server"])
 async def signup(response: UserAuth):
-    ...
+    response_result = GeneralResponse.get_instance(data={},
+                                      status="not_allowed",
+                                      message=["Not authenticated"]
+                                      )
+    ops_signup(response_result, response)
+
+    return response_result
