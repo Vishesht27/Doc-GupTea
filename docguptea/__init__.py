@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from docguptea import router
+import router
 
 app = FastAPI(title="DocGup-Tea",
               version="V0.0.1",
