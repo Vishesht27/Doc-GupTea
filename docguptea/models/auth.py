@@ -7,6 +7,7 @@ from .generic import Base
 class TokenSchema(Base):
     access_token: str
     refresh_token: str
+    api_key: str
 
 
 class UserAuth(Base):
@@ -22,3 +23,11 @@ class User(Base):
 class TokenPayload(Base):
     sub: str = None
     exp: int = None
+
+
+class LoginCreds(Base):
+    username: str
+    password: str
+
+class APIKey(Base):
+    api_key: str

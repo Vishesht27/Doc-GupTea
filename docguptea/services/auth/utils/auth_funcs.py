@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from fastapi.exceptions import HTTPException
 
-from docguptea.core.ConfigEnv import settings
+from docguptea.core.ConfigEnv import config
 from docguptea.core.Exceptions import *
 from docguptea.models import TokenPayload, TokenSchema
 
@@ -31,6 +31,8 @@ class Auth:
                                    using `bcrypt` algorithm.
     """
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+    
 
     @classmethod
     def get_password_hash(cls,password: str) -> str:
@@ -87,7 +89,7 @@ class Auth:
             expires_delta = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
         to_encode = {"exp": expires_delta, "sub": str(subject)}
-        encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, config.JWT_SECRET_KEY, config.ALGORITHM)
         return encoded_jwt
 
     @staticmethod    
@@ -107,7 +109,7 @@ class Auth:
             expires_delta = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
         
         to_encode = {"exp": expires_delta, "sub": str(subject)}
-        encoded_jwt = jwt.encode(to_encode, settings.JWT_REFRESH_SECRET_KEY, settings.ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, config.JWT_REFRESH_SECRET_KEY, config.ALGORITHM)
         return encoded_jwt
 
     @staticmethod
@@ -131,13 +133,13 @@ class Auth:
                                         )
         try:
             payload = jwt.decode(
-                token, settings.JWT_REFRESH_SECRET_KEY, algorithms=[settings.ALGORITHM]
+                token, config.JWT_REFRESH_SECRET_KEY, algorithms=[config.ALGORITHM]
             )
             token_data = TokenPayload(**payload)
             if datetime.fromtimestamp(token_data.exp)< datetime.now():
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
         except (jwt.JWTError, ValidationError):
-            raise LoginFailedException(tokens)
+            raise InvalidCredentialsException(tokens)
         tokens['access_token'] = Auth.create_access_token(token_data.sub)
         tokens['refresh_token'] = Auth.create_refresh_token(token_data.sub)
         tokens['status'] = 'login successful'
@@ -147,4 +149,19 @@ class Auth:
     @classmethod
     def generate_api_key(cls, username: str):
         return cls.get_password_hash(username + secrets.token_urlsafe(25 - len(username)))
+    
+    @classmethod
+    def get_user_credentials(cls,access_token:str):
+        response_result = GeneralResponse.get_instance(data={},
+                                      status="not_allowed",
+                                      message=["Not authenticated"]
+                                      )
+        try:
+            payload = jwt.decode(
+                access_token, config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM]
+            )
+            token_data = TokenPayload(**payload)
+            return token_data.sub
+        except (jwt.JWTError, ValidationError):
+            raise InvalidCredentialsException(response_result)
 

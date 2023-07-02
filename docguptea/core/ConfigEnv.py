@@ -10,7 +10,9 @@ class Settings(BaseSettings):
     DATABASE: str
     USER: str
     PASSWORD: str
-
+    ALGORITHM:str
+    JWT_SECRET_KEY:str
+    JWT_REFRESH_SECRET_KEY:str
     class Config:
         env_file = ".env"
 
