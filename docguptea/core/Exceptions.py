@@ -3,11 +3,11 @@ import json
 from docguptea.models import GeneralResponse, TokenSchema
 
 
-class LoginFailedException(Exception):
-    def __init__(self, token_result: TokenSchema):
+class InvalidCredentialsException(Exception):
+    def __init__(self, token_result: GeneralResponse):
         self.token_result = token_result
         self.set_statuses()
-        super(LoginFailedException, self).__init__()
+        super(InvalidCredentialsException, self).__init__()
 
     def set_statuses(self):
         self.token_result.status = 'login_failed'

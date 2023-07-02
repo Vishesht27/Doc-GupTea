@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from docguptea import app
 from docguptea.utils import DBConnection
-from docguptea.models import UserAuth, GeneralResponse
+from docguptea.models import *
 from docguptea.services.auth import *
 
 
@@ -45,3 +45,19 @@ async def signup(response: UserAuth):
     ops_signup(response_result, response)
 
     return response_result
+
+@app.post("/auth/login", summary="Logs in user", response_model=TokenSchema, tags=["Auth Server"])
+async def login(response:LoginCreds):
+    return ops_login(response)
+
+@app.put("/auth/regenerate_api_key",summary="Forget Password",response_model=APIKey,tags=["Auth Server"],dependencies=[Depends(JWTBearer())])
+async def regenerate_api_key(access_token: str = Depends(JWTBearer())):
+    user_sub=Auth.get_user_credentials(access_token)
+
+    return ops_regenerate_api_key(user_sub)
+
+# @app.post("/auth/use_refresh_token", summary="generate a fresh pair of access tokens using refresh tokens",
+#           response_model=TokenSchema, tags=["Authorization Server"], dependencies=[Depends(JWTBearer())])
+# async def auth_use_refresh_token(existing_tokens: UseRefreshToken):
+#     return handle_refresh_token_access(existing_tokens.refresh_access_token)
+

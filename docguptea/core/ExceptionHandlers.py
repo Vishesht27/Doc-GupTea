@@ -14,8 +14,8 @@ async def handle_existing_user_found(request: Request, exec: ExistingUserExcepti
                         )
 
 
-@app.exception_handler(LoginFailedException)
-async def handle_login_failed(request: Request, exec: LoginFailedException):
+@app.exception_handler(InvalidCredentialsException)
+async def handle_login_failed(request: Request, exec: InvalidCredentialsException):
     return JSONResponse(status_code=status.HTTP_403_FORBIDDEN,
                         content=repr(exec)
                         )
